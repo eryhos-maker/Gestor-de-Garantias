@@ -1,23 +1,25 @@
 import { useState } from 'react';
 import { AnimatePresence } from 'motion/react';
-import { FileText, Truck, Search, ShieldCheck } from 'lucide-react';
-import { useGarantias } from './hooks/useGarantias';
+import { FileText, Truck, Search, ClipboardList, AlertTriangle } from 'lucide-react';
+import { apiConfigurada } from './lib/api';
 import Registro from './screens/Registro';
 import Embarque from './screens/Embarque';
 import Consulta from './screens/Consulta';
+import Reporte from './screens/Reporte';
+import Asistente from './components/Asistente';
 
 import { Logo } from './components/Logo';
 
-type Screen = 'registro' | 'embarque' | 'consulta';
+type Screen = 'registro' | 'embarque' | 'consulta' | 'reporte';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('registro');
-  const { registrarGarantia, actualizarEstatus, buscarPorFolio, obtenerSiguienteFolio } = useGarantias();
 
   const navItems = [
     { id: 'registro', label: 'Registro', icon: FileText },
     { id: 'embarque', label: 'Embarque', icon: Truck },
     { id: 'consulta', label: 'Consulta', icon: Search },
+    { id: 'reporte', label: 'Reporte', icon: ClipboardList },
   ] as const;
 
   return (
@@ -33,7 +35,7 @@ export default function App() {
               </h1>
             </div>
             
-            <nav className="flex bg-brand-blue-light/30 p-1.5 rounded-xl backdrop-blur-sm">
+            <nav className="flex flex-wrap justify-center bg-brand-blue-light/30 p-1.5 rounded-xl backdrop-blur-sm">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = currentScreen === item.id;
@@ -59,18 +61,28 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {!apiConfigurada() && (
+          <div className="max-w-3xl mx-auto mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800 flex gap-2">
+            <AlertTriangle size={18} className="shrink-0 mt-0.5" />
+            Falta configurar la conexión a Google Sheets (VITE_SHEETS_API_URL y VITE_SHEETS_API_KEY). No se podrá guardar ni buscar.
+          </div>
+        )}
         <AnimatePresence mode="wait">
           {currentScreen === 'registro' && (
-            <Registro key="registro" onRegistrar={registrarGarantia} onObtenerSiguienteFolio={obtenerSiguienteFolio} />
+            <Registro key="registro" />
           )}
           {currentScreen === 'embarque' && (
-            <Embarque key="embarque" onBuscar={buscarPorFolio} onActualizar={actualizarEstatus} />
+            <Embarque key="embarque" />
           )}
           {currentScreen === 'consulta' && (
-            <Consulta key="consulta" onBuscar={buscarPorFolio} onActualizar={actualizarEstatus} />
+            <Consulta key="consulta" />
+          )}
+          {currentScreen === 'reporte' && (
+            <Reporte key="reporte" />
           )}
         </AnimatePresence>
       </main>
+      <Asistente />
     </div>
   );
 }

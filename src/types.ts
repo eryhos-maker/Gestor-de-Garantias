@@ -1,4 +1,9 @@
-export type EstatusGarantia = 'Sin Enviar' | 'En proceso' | 'Listo';
+export type EstatusGarantia =
+  | 'Sin Enviar'      // Recibida en tienda, falta mandarla al proveedor
+  | 'En proceso'      // Embarcada al proveedor
+  | 'En Tienda'       // Regresó del proveedor, espera al cliente
+  | 'Nota de Crédito' // El proveedor la resolvió con nota de crédito
+  | 'Listo';          // Entregada al cliente (cerrada)
 
 export interface Garantia {
   folio: string;
@@ -15,4 +20,10 @@ export interface Garantia {
   estatus: EstatusGarantia;
   fechaEmbarque?: string; // ISO date string
   fechaEntrega?: string; // ISO date string
+  avisos: number; // veces que se avisó al cliente que ya puede recoger
+  ultimoAviso?: string; // ISO date string
+  actualizado?: string; // ISO date string
 }
+
+/** Datos que captura la tienda; folio, estatus y fechas los pone el sistema. */
+export type NuevaGarantia = Omit<Garantia, 'folio' | 'estatus' | 'fechaRecibo' | 'fechaEmbarque' | 'fechaEntrega' | 'avisos' | 'ultimoAviso' | 'actualizado'>;
