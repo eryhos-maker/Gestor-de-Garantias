@@ -106,10 +106,48 @@ export function useGarantias() {
     }
   };
 
+  const obtenerSiguienteFolio = async (): Promise<string> => {
+    try {
+      if (USE_REAL_API) {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('Error al obtener folios');
+        const data = await response.json();
+        
+        let maxFolio = 0;
+        if (Array.isArray(data)) {
+          for (const item of data) {
+            if (item.folio) {
+              const num = parseInt(item.folio.replace(/\D/g, ''), 10);
+              if (!isNaN(num) && num > maxFolio) {
+                maxFolio = num;
+              }
+            }
+          }
+        }
+        return `GAR-${(maxFolio + 1).toString().padStart(4, '0')}`;
+      } else {
+        let maxFolio = 0;
+        for (const item of garantias) {
+          if (item.folio) {
+            const num = parseInt(item.folio.replace(/\D/g, ''), 10);
+            if (!isNaN(num) && num > maxFolio) {
+              maxFolio = num;
+            }
+          }
+        }
+        return `GAR-${(maxFolio + 1).toString().padStart(4, '0')}`;
+      }
+    } catch (error) {
+      console.error('Error al generar folio secuencial:', error);
+      return 'GAR-0001';
+    }
+  };
+
   return {
     garantias,
     registrarGarantia,
     actualizarEstatus,
-    buscarPorFolio
+    buscarPorFolio,
+    obtenerSiguienteFolio
   };
 }

@@ -7,9 +7,10 @@ import { LOGO_SVG_STRING } from '../components/Logo';
 
 interface Props {
   onRegistrar: (garantia: Garantia) => Promise<void>;
+  onObtenerSiguienteFolio: () => Promise<string>;
 }
 
-export default function Registro({ onRegistrar }: Props) {
+export default function Registro({ onRegistrar, onObtenerSiguienteFolio }: Props) {
   const [folio, setFolio] = useState('');
   const [cliente, setCliente] = useState('');
   const [direccion, setDireccion] = useState('');
@@ -24,9 +25,13 @@ export default function Registro({ onRegistrar }: Props) {
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const generateFolio = () => {
-    const randomNum = Math.floor(10000 + Math.random() * 90000);
-    setFolio(`GAR-${randomNum}`);
+  const generateFolio = async () => {
+    try {
+      const nextFolio = await onObtenerSiguienteFolio();
+      setFolio(nextFolio);
+    } catch (error) {
+      setFolio('GAR-0001');
+    }
   };
 
   useEffect(() => {
@@ -63,7 +68,7 @@ export default function Registro({ onRegistrar }: Props) {
       setSuccessMsg(`Garantía ${folio} registrada exitosamente. El ticket se ha descargado.`);
       
       // Reset form
-      generateFolio();
+      await generateFolio();
       setCliente('');
       setDireccion('');
       setTelefono('');

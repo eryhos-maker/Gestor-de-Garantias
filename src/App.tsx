@@ -12,7 +12,7 @@ type Screen = 'registro' | 'embarque' | 'consulta';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('registro');
-  const { registrarGarantia, actualizarEstatus, buscarPorFolio } = useGarantias();
+  const { registrarGarantia, actualizarEstatus, buscarPorFolio, obtenerSiguienteFolio } = useGarantias();
 
   const navItems = [
     { id: 'registro', label: 'Registro', icon: FileText },
@@ -61,7 +61,7 @@ export default function App() {
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <AnimatePresence mode="wait">
           {currentScreen === 'registro' && (
-            <Registro key="registro" onRegistrar={registrarGarantia} />
+            <Registro key="registro" onRegistrar={registrarGarantia} onObtenerSiguienteFolio={obtenerSiguienteFolio} />
           )}
           {currentScreen === 'embarque' && (
             <Embarque key="embarque" onBuscar={buscarPorFolio} onActualizar={actualizarEstatus} />
