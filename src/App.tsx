@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { AnimatePresence } from 'motion/react';
-import { FileText, Truck, Search, AlertTriangle } from 'lucide-react';
+import { FileText, Truck, Search, ClipboardList, AlertTriangle } from 'lucide-react';
 import { apiConfigurada } from './lib/api';
 import Registro from './screens/Registro';
 import Embarque from './screens/Embarque';
 import Consulta from './screens/Consulta';
+import Reporte from './screens/Reporte';
+import Asistente from './components/Asistente';
 
 import { Logo } from './components/Logo';
 
-type Screen = 'registro' | 'embarque' | 'consulta';
+type Screen = 'registro' | 'embarque' | 'consulta' | 'reporte';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('registro');
@@ -17,6 +19,7 @@ export default function App() {
     { id: 'registro', label: 'Registro', icon: FileText },
     { id: 'embarque', label: 'Embarque', icon: Truck },
     { id: 'consulta', label: 'Consulta', icon: Search },
+    { id: 'reporte', label: 'Reporte', icon: ClipboardList },
   ] as const;
 
   return (
@@ -32,7 +35,7 @@ export default function App() {
               </h1>
             </div>
             
-            <nav className="flex bg-brand-blue-light/30 p-1.5 rounded-xl backdrop-blur-sm">
+            <nav className="flex flex-wrap justify-center bg-brand-blue-light/30 p-1.5 rounded-xl backdrop-blur-sm">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = currentScreen === item.id;
@@ -74,8 +77,12 @@ export default function App() {
           {currentScreen === 'consulta' && (
             <Consulta key="consulta" />
           )}
+          {currentScreen === 'reporte' && (
+            <Reporte key="reporte" />
+          )}
         </AnimatePresence>
       </main>
+      <Asistente />
     </div>
   );
 }

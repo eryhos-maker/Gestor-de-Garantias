@@ -1,5 +1,9 @@
 import { EstatusGarantia } from '../types';
 
+/** Reglas del proceso (ver manual): máximo de avisos y días antes de escalar. */
+export const MAX_AVISOS = 3;
+export const DIAS_LIMITE = 30;
+
 export const ESTATUS: EstatusGarantia[] = ['Sin Enviar', 'En proceso', 'En Tienda', 'Nota de Crédito', 'Listo'];
 
 /** Texto que ve el usuario (en la hoja se guarda el valor original). */

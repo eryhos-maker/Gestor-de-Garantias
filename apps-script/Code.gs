@@ -29,7 +29,7 @@ var CONFIG = {
 var HEADERS = [
   'folio', 'cliente', 'direccion', 'telefono', 'fechaRecibo', 'proveedor',
   'motivo', 'codigo', 'descripcion', 'cantidad', 'observaciones', 'estatus',
-  'fechaEmbarque', 'fechaEntrega', 'actualizado'
+  'fechaEmbarque', 'fechaEntrega', 'avisos', 'ultimoAviso', 'actualizado'
 ];
 
 // Campos que la app puede modificar después del registro.
@@ -68,6 +68,8 @@ function handle_(params) {
         return json_({ ok: true, data: withLock_(function () { return crear_(params.data); }) });
       case 'update':
         return json_({ ok: true, data: withLock_(function () { return actualizar_(params.folio, params.data); }) });
+      case 'registrarAviso':
+        return json_({ ok: true, data: withLock_(function () { return registrarAviso_(params.folio); }) });
       default:
         return json_({ ok: false, error: 'Acción no válida: ' + params.action });
     }
@@ -216,6 +218,8 @@ function crear_(g) {
   nueva.fechaEmbarque = '';
   nueva.fechaEntrega = '';
   nueva.actualizado = ahora;
+  nueva.avisos = 0;
+  nueva.ultimoAviso = '';
   nueva.cantidad = Math.max(1, parseInt(g.cantidad, 10) || 1);
 
   var fila = headers.map(function (h) { return toCell_(nueva[h]); });
@@ -246,6 +250,25 @@ function actualizar_(folio, cambios) {
     var cell = sheet.getRange(rowIndex, col);
     cell.setNumberFormat('@');
     cell.setValue(toCell_(cambios[campo]));
+  });
+  return buscarPorFolio_(folio);
+}
+
+/** Suma 1 al contador de avisos al cliente y guarda la fecha del aviso. */
+function registrarAviso_(folio) {
+  if (!folio) throw new Error('Falta el folio');
+  var sheet = getSheet_();
+  var headers = asegurarEncabezados_(sheet);
+  var rowIndex = filaDeFolio_(sheet, headers, folio);
+  if (rowIndex === -1) throw new Error('No se encontró el folio ' + folio);
+
+  var colAvisos = headers.indexOf('avisos') + 1;
+  var actual = parseInt(sheet.getRange(rowIndex, colAvisos).getDisplayValue(), 10) || 0;
+  var ahora = new Date().toISOString();
+  [['avisos', String(actual + 1)], ['ultimoAviso', ahora], ['actualizado', ahora]].forEach(function (par) {
+    var cell = sheet.getRange(rowIndex, headers.indexOf(par[0]) + 1);
+    cell.setNumberFormat('@');
+    cell.setValue(par[1]);
   });
   return buscarPorFolio_(folio);
 }

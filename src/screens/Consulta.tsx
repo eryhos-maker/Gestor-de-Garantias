@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { PackageCheck, Store, Receipt, Printer, MessageCircle } from 'lucide-react';
+import { PackageCheck, Store, Receipt, Printer, MessageCircle, BellRing } from 'lucide-react';
 import { EstatusGarantia, Garantia } from '../types';
 import { api } from '../lib/api';
-import { ETIQUETA_ESTATUS } from '../lib/estatus';
+import { ETIQUETA_ESTATUS, formatearFecha, MAX_AVISOS } from '../lib/estatus';
 import { imprimirTicket, enviarPorWhatsApp } from '../lib/ticket';
 import { BusquedaFolio, DetalleGarantia, Aviso } from '../components/BusquedaFolio';
 
@@ -40,7 +40,25 @@ export default function Consulta() {
     }
   };
 
+  const registrarAviso = async () => {
+    if (!garantia) return;
+    setIsSubmitting(true);
+    setErrorMsg('');
+    setSuccessMsg('');
+    try {
+      const actualizada = await api.registrarAviso(garantia.folio);
+      setGarantia(actualizada);
+      setSuccessMsg(`Aviso ${actualizada.avisos} registrado para ${garantia.folio}.`);
+    } catch (error: any) {
+      setErrorMsg(error.message || 'Error al registrar el aviso');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const estatus = garantia?.estatus;
+  // Solo se avisa cuando el producto (o la nota) ya está en tienda.
+  const listaParaAvisar = estatus === 'En Tienda' || estatus === 'Nota de Crédito';
   const cerrada = estatus === 'Listo';
   // Si todavía no regresa del proveedor, pedimos confirmar antes de entregar.
   const entregaAnticipada = estatus === 'Sin Enviar' || estatus === 'En proceso';
@@ -82,6 +100,30 @@ export default function Consulta() {
         >
           <div className="p-6">
             <DetalleGarantia g={garantia} />
+
+            <div className="mt-6 p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="text-sm">
+                <span className="block text-slate-500">Avisos al cliente</span>
+                <span className={`font-semibold ${garantia.avisos >= MAX_AVISOS ? 'text-red-600' : 'text-slate-800'}`}>
+                  {garantia.avisos} de {MAX_AVISOS}
+                </span>
+                {garantia.ultimoAviso && (
+                  <span className="text-slate-500"> · último: {formatearFecha(garantia.ultimoAviso)}</span>
+                )}
+                {garantia.avisos >= MAX_AVISOS && !cerrada && (
+                  <span className="block text-red-600 text-xs mt-1">Ya se dieron {MAX_AVISOS} avisos: lo decide el gerente.</span>
+                )}
+              </div>
+              <button
+                onClick={registrarAviso}
+                disabled={isSubmitting || cerrada || !listaParaAvisar}
+                title={listaParaAvisar ? 'Anota que ya se le avisó al cliente' : 'Se avisa cuando está En tienda o con Nota de crédito'}
+                className="flex items-center gap-2 px-4 py-2 bg-brand-blue text-white rounded-lg text-sm font-medium hover:bg-brand-blue-light transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <BellRing size={16} />
+                Registrar aviso
+              </button>
+            </div>
 
             {confirmarEntrega && (
               <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">

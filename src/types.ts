@@ -20,8 +20,10 @@ export interface Garantia {
   estatus: EstatusGarantia;
   fechaEmbarque?: string; // ISO date string
   fechaEntrega?: string; // ISO date string
+  avisos: number; // veces que se avisó al cliente que ya puede recoger
+  ultimoAviso?: string; // ISO date string
   actualizado?: string; // ISO date string
 }
 
 /** Datos que captura la tienda; folio, estatus y fechas los pone el sistema. */
-export type NuevaGarantia = Omit<Garantia, 'folio' | 'estatus' | 'fechaRecibo' | 'fechaEmbarque' | 'fechaEntrega' | 'actualizado'>;
+export type NuevaGarantia = Omit<Garantia, 'folio' | 'estatus' | 'fechaRecibo' | 'fechaEmbarque' | 'fechaEntrega' | 'avisos' | 'ultimoAviso' | 'actualizado'>;

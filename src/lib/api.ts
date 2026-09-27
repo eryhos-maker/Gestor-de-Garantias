@@ -89,6 +89,8 @@ function filaAGarantia(row: Record<string, unknown>): Garantia {
     estatus: normalizarEstatus(row.estatus),
     fechaEmbarque: texto(row.fechaEmbarque) || undefined,
     fechaEntrega: texto(row.fechaEntrega) || undefined,
+    avisos: Math.max(0, parseInt(texto(row.avisos), 10) || 0),
+    ultimoAviso: texto(row.ultimoAviso) || undefined,
     actualizado: texto(row.actualizado) || undefined,
   };
 }
@@ -113,6 +115,12 @@ export const api = {
     const row = await post<Record<string, unknown>>('create', {
       data: { ...datos, fechaRecibo: new Date().toISOString() },
     });
+    return filaAGarantia(row);
+  },
+
+  /** Suma 1 al contador de avisos al cliente (lo cuenta la hoja, no se pierde). */
+  async registrarAviso(folio: string): Promise<Garantia> {
+    const row = await post<Record<string, unknown>>('registrarAviso', { folio });
     return filaAGarantia(row);
   },
 

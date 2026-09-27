@@ -10,6 +10,10 @@ Los datos viven en una hoja de Google Sheets y la app se conecta **directo** a e
 - **Consulta:** busca el folio, lo marca como *En tienda*, *Nota de crédito* o *Entregada*, y permite **reimprimir el ticket**.
 - El folio se puede buscar como `GAR-0015`, `gar-15` o solo `15`.
 - Muestra cuántos días lleva abierta cada garantía (en rojo después de 30 días).
+- **Avisos al cliente:** en Consulta, botón *Registrar aviso* (cuenta hasta 3 y guarda la fecha).
+- **Reporte semanal:** garantías con 3 avisos o más, con más de 30 días y con nota de crédito; se descarga en PDF para la revisión del Jefe de Operaciones con el Gerente.
+- **Asistente de dudas:** botón *¿Dudas?* con las preguntas frecuentes del manual (se editan en `src/lib/faq.ts`).
+- **Ticket en dos copias** (cliente y tienda) y envío del comprobante por **WhatsApp**.
 
 ### Estatus
 
@@ -36,6 +40,8 @@ Si se intenta entregar una garantía que aún no regresa del proveedor, la app p
    - Ejecutar como: **Yo**
    - Quién tiene acceso: **Cualquier usuario**
 7. Copia la URL que termina en `/exec`.
+
+> Cada vez que se actualice `Code.gs` (por ejemplo, al agregar el contador de avisos) hay que pegar el código nuevo y publicar una **Nueva versión**; si no, la app marcará "Acción no válida".
 
 > Si después cambias el código del script: **Implementar > Administrar implementaciones > Editar > Nueva versión**. Así la URL no cambia.
 
