@@ -3,6 +3,9 @@ import { EstatusGarantia } from '../types';
 /** Reglas del proceso (ver manual): máximo de avisos y días antes de escalar. */
 export const MAX_AVISOS = 3;
 export const DIAS_LIMITE = 30;
+/** Calendario de avisos: el 1º al marcar En tienda / Nota de crédito, el 2º a los 6 días y el 3º a los 15 días. */
+export const DIA_AVISO_2 = 6;
+export const DIA_AVISO_3 = 15;
 
 export const ESTATUS: EstatusGarantia[] = ['Sin Enviar', 'En proceso', 'En Tienda', 'Nota de Crédito', 'Listo'];
 
@@ -49,4 +52,27 @@ export function formatearFecha(fechaIso?: string): string {
   const d = new Date(fechaIso);
   if (isNaN(d.getTime())) return fechaIso; // si en la hoja quedó texto, se muestra tal cual
   return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+/**
+ * ¿Toca dar otro aviso al cliente? Solo aplica a garantías En tienda o con Nota de crédito.
+ * Como la hoja guarda la fecha del último aviso, el 2º toca 6 días después del 1º
+ * y el 3º, 9 días después del 2º (día 15 si se avisó a tiempo).
+ */
+export function avisoPendiente(g: { estatus: EstatusGarantia; avisos: number; ultimoAviso?: string }):
+  { numero: 2 | 3; dias: number; vencido: boolean } | null {
+  if (g.estatus !== 'En Tienda' && g.estatus !== 'Nota de Crédito') return null;
+  const dias = diasDesde(g.ultimoAviso);
+  if (g.avisos === 1 && dias !== null) return { numero: 2, dias, vencido: dias >= DIA_AVISO_2 };
+  if (g.avisos === 2 && dias !== null) return { numero: 3, dias, vencido: dias >= DIA_AVISO_3 - DIA_AVISO_2 };
+  return null;
+}
+
+/** Fecha en que toca el siguiente aviso (o null si ya no aplica). */
+export function fechaSiguienteAviso(g: { estatus: EstatusGarantia; avisos: number; ultimoAviso?: string }): Date | null {
+  const p = avisoPendiente(g);
+  if (!p || !g.ultimoAviso) return null;
+  const base = new Date(g.ultimoAviso).getTime();
+  const espera = p.numero === 2 ? DIA_AVISO_2 : DIA_AVISO_3 - DIA_AVISO_2;
+  return new Date(base + espera * 86_400_000);
 }

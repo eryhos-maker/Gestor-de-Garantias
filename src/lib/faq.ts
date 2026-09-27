@@ -27,7 +27,7 @@ export const FAQS: Faq[] = [
     pregunta: '¿Cómo registro una garantía?',
     claves: ['registrar', 'registro', 'capturar', 'nueva', 'alta', 'dar de alta'],
     respuesta:
-      'Antes de iniciar, guarda el nombre y el teléfono del cliente como contacto en el WhatsApp de la tienda. Luego, en la pantalla Registro: llena Cliente, Teléfono (10 dígitos), Proveedor, Código, Cantidad, Descripción y Motivo. Presiona Guardar / Registrar: el folio lo pone la app. Imprime las dos copias, el cliente firma ambas, se lleva la copia cliente y la copia tienda va con el Jefe de Operaciones.',
+      'Antes de iniciar, guarda el nombre y el teléfono del cliente como contacto en el WhatsApp de la tienda. Luego, en la pantalla Registro: llena Cliente, Teléfono (10 dígitos), Proveedor, Código, Cantidad, Descripción y Motivo. Presiona Guardar / Registrar: el folio lo pone la app. Presiona Imprimir (ya no se descarga solo): salen dos copias. En ambas firma el cliente y quien recibe pone su nombre y firma. La copia cliente se la lleva el cliente y la copia tienda va con el Jefe de Operaciones.',
   },
   {
     pregunta: '¿Por qué no puedo escribir el folio?',
@@ -39,13 +39,13 @@ export const FAQS: Faq[] = [
     pregunta: '¿Cómo imprimo o reimprimo el ticket?',
     claves: ['imprimir', 'reimprimir', 'ticket', 'impresora', 'copia', 'descargar', 'pdf'],
     respuesta:
-      'Al registrar, en el aviso verde presiona Imprimir (salen copia cliente y copia tienda). Si ya cerraste, ve a Consulta, busca el folio y presiona Reimprimir ticket.',
+      'Al registrar, en el aviso verde presiona Imprimir (salen copia cliente y copia tienda; el ticket ya no se descarga solo). En ambas copias firma el cliente y quien recibe pone nombre y firma. Si ya cerraste, ve a Consulta, busca el folio y presiona Reimprimir ticket.',
   },
   {
     pregunta: '¿Cómo mando el comprobante por WhatsApp?',
     claves: ['whatsapp', 'wats', 'mensaje', 'enviar', 'celular', 'contacto', 'agendar'],
     respuesta:
-      'Primero el cliente debe estar guardado como contacto en el WhatsApp de la tienda (se hace antes de registrar). En el aviso verde de Registro o en Consulta presiona WhatsApp: se abre el chat del cliente con el folio y los datos. Solo aparece si el teléfono tiene 10 dígitos. Si quieres mandar el PDF, adjúntalo a mano en el chat.',
+      'Primero el cliente debe estar guardado como contacto en el WhatsApp de la tienda (se hace antes de registrar). Al registrar, el botón WhatsApp del aviso verde manda el comprobante. En Consulta, cuando la garantía está En tienda o con Nota de crédito, usa Avisar por WhatsApp: manda el mensaje de que ya puede pasar por su artículo y cuenta el aviso. Solo aparece si el teléfono tiene 10 dígitos. Si quieres mandar el PDF, adjúntalo a mano en el chat.',
   },
   {
     pregunta: '¿Dónde guardo el producto?',
@@ -69,7 +69,7 @@ export const FAQS: Faq[] = [
     pregunta: '¿Qué hago cuando regresa del proveedor?',
     claves: ['regresa', 'regreso', 'llego', 'volvio', 'reparado', 'cambiado', 'en tienda'],
     respuesta:
-      'En Consulta busca el folio. Si viene reparado o cambiado presiona En tienda; si el proveedor dio nota de crédito presiona Nota de crédito. Déjalo en el área de resguardo y avisa al Asesor Truper o al supervisor para que llame al cliente.',
+      'En Consulta busca el folio. Si viene reparado o cambiado presiona En tienda; si el proveedor dio nota de crédito presiona Nota de crédito. En ese momento manda el aviso al cliente con Avisar por WhatsApp y deja el producto en el área de resguardo.',
   },
   {
     pregunta: '¿Cómo se aplica una nota de crédito?',
@@ -81,13 +81,13 @@ export const FAQS: Faq[] = [
     pregunta: '¿Cómo registro que ya le avisé al cliente?',
     claves: ['aviso', 'avisar', 'avise', 'llame', 'llamar', 'contador', 'recordar'],
     respuesta:
-      'En Consulta busca el folio y presiona Registrar aviso. Se habilita cuando está En tienda o con Nota de crédito. La app cuenta los avisos y guarda la fecha del último.',
+      'En Consulta usa Avisar por WhatsApp (manda el mensaje y cuenta el aviso) o, si le llamaste, Registrar llamada. Se habilita cuando está En tienda o con Nota de crédito. El 1er aviso se manda en cuanto se marca En tienda o Nota de crédito; el 2º a los 6 días y el 3º a los 15 días.',
   },
   {
     pregunta: '¿Qué pasa si el cliente no recoge?',
     claves: ['no recoge', 'no viene', 'abandonado', 'tres avisos', '3 avisos', 'no contesta'],
     respuesta:
-      'Se le dan hasta 3 avisos en 30 días. Después decide el gerente. Esas garantías salen en el Reporte semanal.',
+      'Se le dan 3 avisos: el 1º al llegar a tienda, el 2º a los 6 días y el 3º a los 15 días. El Jefe de Operaciones los revisa cada lunes con el Reporte. Después del 3º decide el gerente.',
   },
   {
     pregunta: '¿Cómo entrego la garantía al cliente?',
@@ -111,7 +111,7 @@ export const FAQS: Faq[] = [
     pregunta: '¿Cómo saco el reporte semanal?',
     claves: ['reporte', 'semanal', 'revision', 'pendientes', 'mas de 30', 'resumen'],
     respuesta:
-      'Pantalla Reporte, botón Generar reporte. Muestra las garantías con 3 avisos o más, las de más de 30 días y las de nota de crédito. Con PDF lo descargas para la revisión con el gerente.',
+      'Cada lunes el Jefe de Operaciones entra a Reporte y presiona Generar reporte. Muestra los avisos que tocan (2º y 3º), las garantías con 3 avisos, las de más de 30 días (sin nota de crédito) y las de nota de crédito. Con PDF lo descarga para revisarlo con el gerente.',
   },
   {
     pregunta: '¿Me equivoqué en un dato, cómo lo corrijo?',

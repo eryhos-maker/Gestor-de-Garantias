@@ -5,15 +5,15 @@ Los datos viven en una hoja de Google Sheets y la app se conecta **directo** a e
 
 ## Qué hace
 
-- **Registro:** captura la garantía y descarga el ticket en PDF (con logo). El folio `GAR-0001` lo asigna la hoja al guardar, así nunca se repite aunque dos cajas registren al mismo tiempo.
+- **Registro:** captura la garantía e imprime el ticket (con logo) con el botón Imprimir; ya no se descarga solo. El folio `GAR-0001` lo asigna la hoja al guardar, así nunca se repite aunque dos cajas registren al mismo tiempo.
 - **Embarque:** busca el folio y lo marca como enviado al proveedor.
 - **Consulta:** busca el folio, lo marca como *En tienda*, *Nota de crédito* o *Entregada*, y permite **reimprimir el ticket**.
 - El folio se puede buscar como `GAR-0015`, `gar-15` o solo `15`.
 - Muestra cuántos días lleva abierta cada garantía (en rojo después de 30 días).
-- **Avisos al cliente:** en Consulta, botón *Registrar aviso* (cuenta hasta 3 y guarda la fecha).
-- **Reporte semanal:** garantías con 3 avisos o más, con más de 30 días y con nota de crédito; se descarga en PDF para la revisión del Jefe de Operaciones con el Gerente.
+- **Avisos al cliente:** en Consulta, *Avisar por WhatsApp* manda el mensaje según el estatus (En tienda / Nota de crédito) y cuenta el aviso; *Registrar llamada* cuenta avisos por teléfono. Calendario: 1º al llegar a tienda, 2º a los 6 días, 3º a los 15 días.
+- **Revisión de los lunes (Reporte):** avisos que tocan (2º y 3º), garantías con 3 avisos, más de 30 días (sin nota de crédito) y nota de crédito; PDF para la revisión del Jefe de Operaciones con el Gerente.
 - **Asistente de dudas:** botón *¿Dudas?* con las preguntas frecuentes del manual (se editan en `src/lib/faq.ts`).
-- **Ticket en dos copias** (cliente y tienda) y envío del comprobante por **WhatsApp**.
+- **Ticket en dos copias** (cliente y tienda) con firma del cliente y nombre y firma de quien recibe en ambas; envío del comprobante por **WhatsApp**.
 
 ### Estatus
 

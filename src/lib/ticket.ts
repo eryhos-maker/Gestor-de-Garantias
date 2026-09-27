@@ -95,12 +95,16 @@ function dibujar(doc: jsPDF, g: Garantia, copia: Copia): number {
   if (g.observaciones) campo('Obs.', g.observaciones);
   separador();
 
-  // Firma del cliente
-  y += 8;
-  doc.setLineWidth(0.3);
-  doc.line(MARGEN + 10, y, ANCHO - MARGEN - 10, y);
-  y += 4;
-  centrado('Firma del cliente', 8);
+  // Firmas: el cliente y quien recibe firman AMBAS copias
+  const lineaFirma = (texto: string) => {
+    y += 9;
+    doc.setLineWidth(0.3);
+    doc.line(MARGEN + 10, y, ANCHO - MARGEN - 10, y);
+    y += 4;
+    centrado(texto, 8);
+  };
+  lineaFirma('Firma del cliente');
+  lineaFirma('Recibió: nombre y firma');
   y += 3;
 
   if (copia === 'CLIENTE') {
@@ -108,10 +112,6 @@ function dibujar(doc: jsPDF, g: Garantia, copia: Copia): number {
     centrado('o para cualquier aclaración.', 8);
   } else {
     centrado('Archivo de tienda · Jefe de Operaciones', 8, 'bold');
-    y += 6;
-    doc.line(MARGEN + 10, y, ANCHO - MARGEN - 10, y);
-    y += 4;
-    centrado('Recibió (nombre y firma)', 8);
   }
   y += 4;
 
@@ -163,24 +163,50 @@ export function imprimirTicket(g: Garantia): void {
   if (!ventana) doc.save(nombreArchivo(g));
 }
 
-/**
- * Abre WhatsApp con el comprobante en texto para el cliente.
- * (WhatsApp no permite adjuntar el PDF desde una liga; si se quiere el PDF,
- * se descarga y se adjunta a mano en la conversación.)
- */
-export function enviarPorWhatsApp(g: Garantia): boolean {
-  const tel = g.telefono.replace(/\D/g, '');
-  if (tel.length !== 10) return false;
-  const texto = [
+/** Mensaje de WhatsApp según la etapa de la garantía. */
+export function mensajeWhatsApp(g: Garantia): string {
+  const producto = [g.codigo, g.descripcion].filter(Boolean).join(' - ');
+  const saludo = `Hola ${g.cliente.split(' ')[0] || ''}, le escribimos de Ferre Don Nico (Ferre Mina).`.replace(' ,', ',');
+  if (g.estatus === 'En Tienda') {
+    return [
+      saludo,
+      `Le informamos que su artículo en garantía ya se encuentra en tienda y puede pasar a recogerlo.`,
+      `Folio: ${g.folio}`,
+      `Producto: ${producto}`,
+      '',
+      'Por favor presente su ticket de garantía o este folio al recogerlo. ¡Gracias por su preferencia!',
+    ].join('\n');
+  }
+  if (g.estatus === 'Nota de Crédito') {
+    return [
+      saludo,
+      `Le informamos que su garantía ya fue resuelta y puede pasar a recoger su nuevo artículo.`,
+      `Folio: ${g.folio}`,
+      `Producto original: ${producto}`,
+      '',
+      'Por favor presente su ticket de garantía o este folio al acudir a tienda. ¡Gracias por su preferencia!',
+    ].join('\n');
+  }
+  return [
     'Ferre Don Nico · Comprobante de garantía',
     `Folio: ${g.folio}`,
     `Fecha: ${fechaHora(g.fechaRecibo)}`,
     `Cliente: ${g.cliente}`,
-    `Producto: ${[g.codigo, g.descripcion].filter(Boolean).join(' - ')} (Cant. ${g.cantidad})`,
+    `Producto: ${producto} (Cant. ${g.cantidad})`,
     `Motivo: ${g.motivo}`,
     '',
     'Presente su ticket impreso o este folio para recoger su producto. Le avisaremos por este medio cuando esté listo.',
   ].join('\n');
-  window.open(`https://wa.me/52${tel}?text=${encodeURIComponent(texto)}`, '_blank');
+}
+
+/**
+ * Abre WhatsApp con el mensaje que corresponde a la etapa de la garantía
+ * (comprobante, "ya está en tienda" o "pase por su nuevo artículo").
+ * Llamar directo desde un clic para que el navegador no bloquee la ventana.
+ */
+export function enviarPorWhatsApp(g: Garantia): boolean {
+  const tel = g.telefono.replace(/\D/g, '');
+  if (tel.length !== 10) return false;
+  window.open(`https://wa.me/52${tel}?text=${encodeURIComponent(mensajeWhatsApp(g))}`, '_blank');
   return true;
 }

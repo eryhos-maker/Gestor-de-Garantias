@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { PackageCheck, Store, Receipt, Printer, MessageCircle, BellRing } from 'lucide-react';
 import { EstatusGarantia, Garantia } from '../types';
 import { api } from '../lib/api';
-import { ETIQUETA_ESTATUS, formatearFecha, MAX_AVISOS } from '../lib/estatus';
+import { ETIQUETA_ESTATUS, formatearFecha, MAX_AVISOS, fechaSiguienteAviso } from '../lib/estatus';
 import { imprimirTicket, enviarPorWhatsApp } from '../lib/ticket';
 import { BusquedaFolio, DetalleGarantia, Aviso } from '../components/BusquedaFolio';
 
@@ -32,7 +32,11 @@ export default function Consulta() {
       if (estatus === 'Listo') cambios.fechaEntrega = new Date().toISOString();
       const actualizada = await api.actualizar(garantia.folio, cambios);
       setGarantia(actualizada);
-      setSuccessMsg(`La garantía ${garantia.folio} ahora está como "${ETIQUETA_ESTATUS[estatus]}".`);
+      setSuccessMsg(
+        estatus === 'En Tienda' || estatus === 'Nota de Crédito'
+          ? `La garantía ${garantia.folio} ahora está como "${ETIQUETA_ESTATUS[estatus]}". Envía ahora el aviso al cliente con el botón Avisar por WhatsApp.`
+          : `La garantía ${garantia.folio} ahora está como "${ETIQUETA_ESTATUS[estatus]}".`,
+      );
     } catch (error: any) {
       setErrorMsg(error.message || 'Error al cambiar el estatus');
     } finally {
@@ -40,15 +44,22 @@ export default function Consulta() {
     }
   };
 
-  const registrarAviso = async () => {
+  const registrarAviso = async (porWhatsApp = false) => {
     if (!garantia) return;
+    // WhatsApp se abre primero (directo del clic) para que el navegador no lo bloquee.
+    if (porWhatsApp && !enviarPorWhatsApp(garantia)) {
+      setErrorMsg('El teléfono del cliente no tiene 10 dígitos; avísale por llamada y usa Registrar llamada.');
+      return;
+    }
     setIsSubmitting(true);
     setErrorMsg('');
     setSuccessMsg('');
     try {
       const actualizada = await api.registrarAviso(garantia.folio);
       setGarantia(actualizada);
-      setSuccessMsg(`Aviso ${actualizada.avisos} registrado para ${garantia.folio}.`);
+      setSuccessMsg(
+        `Aviso ${actualizada.avisos} ${porWhatsApp ? 'enviado por WhatsApp y ' : ''}registrado para ${garantia.folio}.`,
+      );
     } catch (error: any) {
       setErrorMsg(error.message || 'Error al registrar el aviso');
     } finally {
@@ -110,19 +121,38 @@ export default function Consulta() {
                 {garantia.ultimoAviso && (
                   <span className="text-slate-500"> · último: {formatearFecha(garantia.ultimoAviso)}</span>
                 )}
+                {(() => {
+                  const sig = fechaSiguienteAviso(garantia);
+                  return sig && !cerrada ? (
+                    <span className="block text-xs text-slate-500 mt-1">
+                      Siguiente aviso ({garantia.avisos + 1}º): {formatearFecha(sig.toISOString())}
+                    </span>
+                  ) : null;
+                })()}
                 {garantia.avisos >= MAX_AVISOS && !cerrada && (
                   <span className="block text-red-600 text-xs mt-1">Ya se dieron {MAX_AVISOS} avisos: lo decide el gerente.</span>
                 )}
               </div>
-              <button
-                onClick={registrarAviso}
-                disabled={isSubmitting || cerrada || !listaParaAvisar}
-                title={listaParaAvisar ? 'Anota que ya se le avisó al cliente' : 'Se avisa cuando está En tienda o con Nota de crédito'}
-                className="flex items-center gap-2 px-4 py-2 bg-brand-blue text-white rounded-lg text-sm font-medium hover:bg-brand-blue-light transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <BellRing size={16} />
-                Registrar aviso
-              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => registrarAviso(true)}
+                  disabled={isSubmitting || cerrada || !listaParaAvisar || !garantia.telefono}
+                  title={listaParaAvisar ? 'Abre WhatsApp con el mensaje para el cliente y cuenta el aviso' : 'Se avisa cuando está En tienda o con Nota de crédito'}
+                  className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <MessageCircle size={16} />
+                  Avisar por WhatsApp
+                </button>
+                <button
+                  onClick={() => registrarAviso(false)}
+                  disabled={isSubmitting || cerrada || !listaParaAvisar}
+                  title="Si le avisaste por llamada, regístralo aquí"
+                  className="flex items-center gap-2 px-4 py-2 bg-white text-slate-700 border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <BellRing size={16} />
+                  Registrar llamada
+                </button>
+              </div>
             </div>
 
             {confirmarEntrega && (
@@ -141,13 +171,14 @@ export default function Consulta() {
                   <Printer size={18} />
                   Reimprimir ticket
                 </button>
-                {garantia.telefono && (
+                {garantia.telefono && !listaParaAvisar && (
                   <button
                     onClick={() => enviarPorWhatsApp(garantia)}
+                    title="Reenvía al cliente el comprobante de su garantía"
                     className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-700 border border-slate-300 rounded-lg font-medium hover:bg-slate-50 transition-all"
                   >
                     <MessageCircle size={18} />
-                    WhatsApp
+                    Enviar comprobante
                   </button>
                 )}
               </div>

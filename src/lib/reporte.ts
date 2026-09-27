@@ -1,11 +1,12 @@
 import { jsPDF } from 'jspdf';
 import { EstatusGarantia, Garantia } from '../types';
-import { DIAS_LIMITE, ESTATUS, ETIQUETA_ESTATUS, MAX_AVISOS, diasDesde, formatearFecha } from './estatus';
+import { DIA_AVISO_2, DIA_AVISO_3, DIAS_LIMITE, ESTATUS, ETIQUETA_ESTATUS, MAX_AVISOS, avisoPendiente, diasDesde, formatearFecha } from './estatus';
 
 export interface ReporteSemanal {
   generado: Date;
   abiertas: number;
   porEstatus: { estatus: EstatusGarantia; total: number }[];
+  avisosPendientes: Garantia[];
   tresAvisos: Garantia[];
   masDe30: Garantia[];
   notaCredito: Garantia[];
@@ -27,8 +28,13 @@ export function armarReporte(garantias: Garantia[]): ReporteSemanal {
       estatus: e,
       total: abiertas.filter(g => g.estatus === e).length,
     })),
+    // 2º aviso a los 6 días y 3º a los 15 días de que el producto llegó a tienda
+    avisosPendientes: abiertas.filter(g => avisoPendiente(g)?.vencido).sort(porAntiguedad),
     tresAvisos: abiertas.filter(g => g.avisos >= MAX_AVISOS).sort(porAntiguedad),
-    masDe30: abiertas.filter(g => (diasDesde(g.fechaRecibo) ?? 0) > DIAS_LIMITE).sort(porAntiguedad),
+    // Las de nota de crédito tienen su propio apartado
+    masDe30: abiertas
+      .filter(g => g.estatus !== 'Nota de Crédito' && (diasDesde(g.fechaRecibo) ?? 0) > DIAS_LIMITE)
+      .sort(porAntiguedad),
     notaCredito: abiertas.filter(g => g.estatus === 'Nota de Crédito').sort(porAntiguedad),
   };
 }
@@ -63,7 +69,7 @@ export function crearReportePdf(r: ReporteSemanal): jsPDF {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(15);
-  doc.text('Reporte semanal de garantías · Ferre Mina', M, y + 5);
+  doc.text('Revisión de los lunes · Garantías Ferre Mina', M, y + 5);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9.5);
   y += 11;
@@ -130,8 +136,13 @@ export function crearReportePdf(r: ReporteSemanal): jsPDF {
     y += 8;
   };
 
+  seccion(
+    'Avisos que tocan esta semana',
+    `Dar el 2º aviso (día ${DIA_AVISO_2}) o el 3º aviso (día ${DIA_AVISO_3}) por WhatsApp y registrarlo en Consulta.`,
+    r.avisosPendientes,
+  );
   seccion(`Con ${MAX_AVISOS} avisos o más`, 'El cliente no ha recogido: lo decide el gerente.', r.tresAvisos);
-  seccion(`Más de ${DIAS_LIMITE} días abiertas`, 'Escalar con el proveedor o dar solución al cliente.', r.masDe30);
+  seccion(`Más de ${DIAS_LIMITE} días abiertas (sin nota de crédito)`, 'Escalar con el proveedor o dar solución al cliente.', r.masDe30);
   seccion('Con nota de crédito', 'Aplicar cambio físico o, si ya no se maneja, a cuenta de otra compra.', r.notaCredito);
 
   // Firmas de la revisión

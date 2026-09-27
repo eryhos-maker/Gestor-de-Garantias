@@ -73,7 +73,6 @@ export default function Registro() {
       });
 
       setRegistrada(garantia);
-      descargarTicket(garantia);
       setForm(VACIO);
       cargarFolio();
     } catch (error: any) {
@@ -99,7 +98,7 @@ export default function Registro() {
         {registrada && (
           <div className="p-4 bg-emerald-50 text-emerald-800 rounded-lg text-sm border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <span>
-              Garantía <strong className="font-mono">{registrada.folio}</strong> registrada. El ticket (copia cliente y copia tienda) se descargó.
+              Garantía <strong className="font-mono">{registrada.folio}</strong> registrada. Imprime el ticket (copia cliente y copia tienda) para las firmas.
             </span>
             <div className="flex gap-2">
               <button
@@ -114,7 +113,7 @@ export default function Registro() {
                 onClick={() => descargarTicket(registrada)}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-emerald-700 border border-emerald-300 rounded-md text-xs font-medium hover:bg-emerald-100"
               >
-                <Download size={14} /> Descargar otra vez
+                <Download size={14} /> Descargar PDF
               </button>
               {registrada.telefono && (
                 <button

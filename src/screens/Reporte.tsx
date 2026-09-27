@@ -4,7 +4,7 @@ import { ClipboardList, Download, RefreshCw } from 'lucide-react';
 import { Garantia } from '../types';
 import { api } from '../lib/api';
 import { armarReporte, descargarReportePdf, ReporteSemanal } from '../lib/reporte';
-import { COLOR_ESTATUS, DIAS_LIMITE, ETIQUETA_ESTATUS, MAX_AVISOS, diasDesde, formatearFecha } from '../lib/estatus';
+import { COLOR_ESTATUS, DIA_AVISO_2, DIA_AVISO_3, DIAS_LIMITE, ETIQUETA_ESTATUS, MAX_AVISOS, diasDesde, formatearFecha } from '../lib/estatus';
 import { Aviso, EtiquetaEstatus } from '../components/BusquedaFolio';
 
 /** Revisión semanal: Jefe de Operaciones + Gerente. */
@@ -37,9 +37,9 @@ export default function Reporte() {
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-slate-800">Reporte semanal</h2>
+            <h2 className="text-xl font-semibold text-slate-800">Revisión de los lunes</h2>
             <p className="text-sm text-slate-500 mt-1">
-              Garantías que requieren una decisión: {MAX_AVISOS} avisos o más, más de {DIAS_LIMITE} días y notas de crédito.
+              Jefe de Operaciones: genera el reporte cada lunes, da los avisos que tocan y revisa con el gerente lo que requiere decisión.
             </p>
           </div>
           <div className="flex gap-2">
@@ -91,12 +91,17 @@ export default function Reporte() {
       {reporte && (
         <>
           <Seccion
+            titulo="Avisos que tocan esta semana"
+            accion={`Dar el 2º aviso (día ${DIA_AVISO_2}) o el 3º (día ${DIA_AVISO_3}) con el botón Avisar por WhatsApp en Consulta.`}
+            lista={reporte.avisosPendientes}
+          />
+          <Seccion
             titulo={`Con ${MAX_AVISOS} avisos o más`}
             accion="El cliente no ha recogido: lo decide el gerente."
             lista={reporte.tresAvisos}
           />
           <Seccion
-            titulo={`Más de ${DIAS_LIMITE} días abiertas`}
+            titulo={`Más de ${DIAS_LIMITE} días abiertas (sin nota de crédito)`}
             accion="Escalar con el proveedor o dar solución al cliente."
             lista={reporte.masDe30}
           />
