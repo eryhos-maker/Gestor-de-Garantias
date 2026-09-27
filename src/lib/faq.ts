@@ -27,7 +27,7 @@ export const FAQS: Faq[] = [
     pregunta: '¿Cómo registro una garantía?',
     claves: ['registrar', 'registro', 'capturar', 'nueva', 'alta', 'dar de alta'],
     respuesta:
-      'Pantalla Registro: llena Cliente, Teléfono (10 dígitos), Proveedor, Código, Cantidad, Descripción y Motivo. Presiona Guardar / Registrar: el folio lo pone la app. Imprime las dos copias, el cliente firma ambas, se lleva la copia cliente y la copia tienda va con el Jefe de Operaciones.',
+      'Antes de iniciar, guarda el nombre y el teléfono del cliente como contacto en el WhatsApp de la tienda. Luego, en la pantalla Registro: llena Cliente, Teléfono (10 dígitos), Proveedor, Código, Cantidad, Descripción y Motivo. Presiona Guardar / Registrar: el folio lo pone la app. Imprime las dos copias, el cliente firma ambas, se lleva la copia cliente y la copia tienda va con el Jefe de Operaciones.',
   },
   {
     pregunta: '¿Por qué no puedo escribir el folio?',
@@ -43,9 +43,9 @@ export const FAQS: Faq[] = [
   },
   {
     pregunta: '¿Cómo mando el comprobante por WhatsApp?',
-    claves: ['whatsapp', 'wats', 'mensaje', 'enviar', 'celular'],
+    claves: ['whatsapp', 'wats', 'mensaje', 'enviar', 'celular', 'contacto', 'agendar'],
     respuesta:
-      'En el aviso verde de Registro o en Consulta presiona WhatsApp: se abre el chat del cliente con el folio y los datos. Solo aparece si el teléfono tiene 10 dígitos. Si quieres mandar el PDF, adjúntalo a mano en el chat.',
+      'Primero el cliente debe estar guardado como contacto en el WhatsApp de la tienda (se hace antes de registrar). En el aviso verde de Registro o en Consulta presiona WhatsApp: se abre el chat del cliente con el folio y los datos. Solo aparece si el teléfono tiene 10 dígitos. Si quieres mandar el PDF, adjúntalo a mano en el chat.',
   },
   {
     pregunta: '¿Dónde guardo el producto?',
