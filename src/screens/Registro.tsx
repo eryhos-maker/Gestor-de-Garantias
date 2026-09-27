@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { Save } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import { Garantia } from '../types';
-import { LOGO_SVG_STRING } from '../components/Logo';
+import { LOGO_PNG_BASE64 } from '../assets/logoBase64';
 
 interface Props {
   onRegistrar: (garantia: Garantia) => Promise<void>;
@@ -122,14 +122,16 @@ export default function Registro({ onRegistrar, onObtenerSiguienteFolio }: Props
 
     // Encabezado
     try {
-      // Add SVG Logo
-      // Convert SVG string to base64
-      const svgBase64 = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(LOGO_SVG_STRING)));
-      // Center the logo (width 40, height 17.6)
-      doc.addImage(svgBase64, 'SVG', 20, y, 40, 17.6);
-      y += 22;
+      // jsPDF no soporta SVG en addImage (siempre lanzaba error y caía al
+      // texto de respaldo). Usamos el logo en PNG de alta resolución para
+      // que se vea nítido en la impresora térmica.
+      const logoWidth = 44;
+      const logoHeight = 18.67; // proporción real del logo (870x369)
+      const logoX = (width - logoWidth) / 2;
+      doc.addImage(LOGO_PNG_BASE64, 'PNG', logoX, y, logoWidth, logoHeight);
+      y += logoHeight + 4;
     } catch (e) {
-      // Fallback if SVG rendering fails in jsPDF
+      // Respaldo por si la imagen no puede cargarse
       printCentered('Ferre Don Nico', y, 14, 'bold');
       y += 6;
     }
