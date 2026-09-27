@@ -1,20 +1,64 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Gestor de Garantías · Ferre Don Nico
 
-# Run and deploy your AI Studio app
+App para registrar las garantías de los clientes, imprimir su ticket en la Epson TM-T88 (80 mm) y dar seguimiento hasta que se entregan.
+Los datos viven en una hoja de Google Sheets y la app se conecta **directo** a ella con un Apps Script (sin SheetDB).
 
-This contains everything you need to run your app locally.
+## Qué hace
 
-View your app in AI Studio: https://ai.studio/apps/6f2cc494-7c3a-4a92-835b-d50a6b0c8d11
+- **Registro:** captura la garantía y descarga el ticket en PDF (con logo). El folio `GAR-0001` lo asigna la hoja al guardar, así nunca se repite aunque dos cajas registren al mismo tiempo.
+- **Embarque:** busca el folio y lo marca como enviado al proveedor.
+- **Consulta:** busca el folio, lo marca como *En tienda*, *Nota de crédito* o *Entregada*, y permite **reimprimir el ticket**.
+- El folio se puede buscar como `GAR-0015`, `gar-15` o solo `15`.
+- Muestra cuántos días lleva abierta cada garantía (en rojo después de 30 días).
 
-## Run Locally
+### Estatus
 
-**Prerequisites:**  Node.js
+| En la hoja | En la app | Significa |
+|---|---|---|
+| Sin Enviar | Sin enviar | Recibida en tienda, falta mandarla al proveedor |
+| En proceso | Con proveedor | Ya se embarcó |
+| En Tienda | En tienda | Regresó del proveedor, espera al cliente |
+| Nota de Crédito | Nota de crédito | El proveedor la resolvió con nota de crédito |
+| Listo | Entregada | Ya se entregó al cliente (queda cerrada) |
 
+Si se intenta entregar una garantía que aún no regresa del proveedor, la app pide confirmar.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Configuración (una sola vez)
+
+### 1. Apps Script en la hoja
+
+1. Abre la hoja de Google Sheets de garantías y entra a **Extensiones > Apps Script**.
+2. Borra lo que haya y pega el contenido de [`apps-script/Code.gs`](apps-script/Code.gs).
+3. Cambia `API_KEY: 'CAMBIA-ESTA-CLAVE'` por una clave propia (ej. una frase larga sin espacios).
+4. Si las garantías no están en la primera pestaña, escribe su nombre en `SHEET_GARANTIAS`.
+5. Guarda y ejecuta la función `probarConexion` (autoriza los permisos). En el registro debe salir cuántas garantías hay y el siguiente folio.
+6. **Implementar > Nueva implementación** > tipo **Aplicación web**:
+   - Ejecutar como: **Yo**
+   - Quién tiene acceso: **Cualquier usuario**
+7. Copia la URL que termina en `/exec`.
+
+> Si después cambias el código del script: **Implementar > Administrar implementaciones > Editar > Nueva versión**. Así la URL no cambia.
+
+### 2. Variables de la app
+
+En Vercel (Settings > Environment Variables), en AI Studio (Secrets) o en un archivo `.env.local`:
+
+```
+VITE_SHEETS_API_URL=https://script.google.com/macros/s/XXXX/exec
+VITE_SHEETS_API_KEY=la-misma-clave-del-paso-3
+```
+
+Después de guardarlas hay que volver a publicar (redeploy) para que la app las tome.
+
+## Desarrollo local
+
+```
+npm install
+npm run dev
+```
+
+## Seguridad
+
+- La clave va dentro de la app publicada, así que es una protección básica: evita que alguien use la hoja sin conocer la URL y la clave. No compartas la URL del script.
+- El script solo permite **agregar** garantías y **cambiar** estatus, fechas y observaciones. No permite borrar ni modificar los datos del cliente.
+- La URL anterior de SheetDB quedó en el historial público del repositorio: **desactívala o bórrala en sheetdb.io** en cuanto la nueva conexión funcione.
