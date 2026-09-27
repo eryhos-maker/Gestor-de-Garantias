@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Save, Printer, Download } from 'lucide-react';
+import { Save, Printer, Download, MessageCircle } from 'lucide-react';
 import { Garantia } from '../types';
 import { api } from '../lib/api';
-import { descargarTicket, imprimirTicket } from '../lib/ticket';
+import { descargarTicket, imprimirTicket, enviarPorWhatsApp } from '../lib/ticket';
 
 const PROVEEDORES = ['Truper', 'IUSA', 'Rotoplas', 'Mendoza'];
 
@@ -99,7 +99,7 @@ export default function Registro() {
         {registrada && (
           <div className="p-4 bg-emerald-50 text-emerald-800 rounded-lg text-sm border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <span>
-              Garantía <strong className="font-mono">{registrada.folio}</strong> registrada. El ticket se descargó.
+              Garantía <strong className="font-mono">{registrada.folio}</strong> registrada. El ticket (copia cliente y copia tienda) se descargó.
             </span>
             <div className="flex gap-2">
               <button
@@ -116,6 +116,15 @@ export default function Registro() {
               >
                 <Download size={14} /> Descargar otra vez
               </button>
+              {registrada.telefono && (
+                <button
+                  type="button"
+                  onClick={() => enviarPorWhatsApp(registrada)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-emerald-700 border border-emerald-300 rounded-md text-xs font-medium hover:bg-emerald-100"
+                >
+                  <MessageCircle size={14} /> WhatsApp
+                </button>
+              )}
             </div>
           </div>
         )}

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { PackageCheck, Store, Receipt, Printer } from 'lucide-react';
+import { PackageCheck, Store, Receipt, Printer, MessageCircle } from 'lucide-react';
 import { EstatusGarantia, Garantia } from '../types';
 import { api } from '../lib/api';
 import { ETIQUETA_ESTATUS } from '../lib/estatus';
-import { imprimirTicket } from '../lib/ticket';
+import { imprimirTicket, enviarPorWhatsApp } from '../lib/ticket';
 import { BusquedaFolio, DetalleGarantia, Aviso } from '../components/BusquedaFolio';
 
 export default function Consulta() {
@@ -91,13 +91,24 @@ export default function Consulta() {
             )}
 
             <div className="mt-8 pt-6 border-t border-slate-200 flex flex-wrap justify-between gap-3">
-              <button
-                onClick={() => imprimirTicket(garantia)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-700 border border-slate-300 rounded-lg font-medium hover:bg-slate-50 transition-all"
-              >
-                <Printer size={18} />
-                Reimprimir ticket
-              </button>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => imprimirTicket(garantia)}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-700 border border-slate-300 rounded-lg font-medium hover:bg-slate-50 transition-all"
+                >
+                  <Printer size={18} />
+                  Reimprimir ticket
+                </button>
+                {garantia.telefono && (
+                  <button
+                    onClick={() => enviarPorWhatsApp(garantia)}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-white text-slate-700 border border-slate-300 rounded-lg font-medium hover:bg-slate-50 transition-all"
+                  >
+                    <MessageCircle size={18} />
+                    WhatsApp
+                  </button>
+                )}
+              </div>
 
               <div className="flex flex-wrap gap-3">
                 <button

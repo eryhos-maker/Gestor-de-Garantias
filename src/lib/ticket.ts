@@ -19,8 +19,10 @@ function fechaHora(iso: string): string {
   });
 }
 
+type Copia = 'CLIENTE' | 'TIENDA';
+
 /** Dibuja el ticket y regresa el alto usado (mm). */
-function dibujar(doc: jsPDF, g: Garantia): number {
+function dibujar(doc: jsPDF, g: Garantia, copia: Copia): number {
   let y = 6;
 
   const centrado = (texto: string, size: number, estilo: 'normal' | 'bold' = 'normal') => {
@@ -69,6 +71,8 @@ function dibujar(doc: jsPDF, g: Garantia): number {
   centrado('COMPROBANTE DE GARANTÍA', 11, 'bold');
   y += 1;
   centrado(`FOLIO: ${g.folio}`, 16, 'bold');
+  y += 1;
+  centrado(`COPIA ${copia}`, 9, 'bold');
   separador();
 
   campo('Fecha', fechaHora(g.fechaRecibo));
@@ -99,20 +103,35 @@ function dibujar(doc: jsPDF, g: Garantia): number {
   centrado('Firma del cliente', 8);
   y += 3;
 
-  centrado('Presente este ticket para recoger su producto', 8, 'bold');
-  centrado('o para cualquier aclaración.', 8);
+  if (copia === 'CLIENTE') {
+    centrado('Presente este ticket para recoger su producto', 8, 'bold');
+    centrado('o para cualquier aclaración.', 8);
+  } else {
+    centrado('Archivo de tienda · Jefe de Operaciones', 8, 'bold');
+    y += 6;
+    doc.line(MARGEN + 10, y, ANCHO - MARGEN - 10, y);
+    y += 4;
+    centrado('Recibió (nombre y firma)', 8);
+  }
   y += 4;
 
   return y;
 }
 
+/** Dos páginas: copia para el cliente y copia firmada para archivo de tienda. */
 export function crearPdf(g: Garantia): jsPDF {
-  // 1a pasada: medir el alto real del contenido
-  const borrador = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [ANCHO, 1000] });
-  const alto = Math.max(100, Math.ceil(dibujar(borrador, g)));
-  // 2a pasada: ticket del tamaño exacto
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [ANCHO, alto] });
-  dibujar(doc, g);
+  // 1a pasada: medir el alto real de cada copia
+  const medir = (copia: Copia) => {
+    const borrador = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [ANCHO, 1000] });
+    return Math.max(100, Math.ceil(dibujar(borrador, g, copia)));
+  };
+  const altoCliente = medir('CLIENTE');
+  const altoTienda = medir('TIENDA');
+  // 2a pasada: cada copia en su página, del tamaño exacto
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [ANCHO, altoCliente] });
+  dibujar(doc, g, 'CLIENTE');
+  doc.addPage([ANCHO, altoTienda], 'portrait');
+  dibujar(doc, g, 'TIENDA');
   doc.setProperties({ title: `Garantía ${g.folio}` });
   return doc;
 }
@@ -142,4 +161,26 @@ export function imprimirTicket(g: Garantia): void {
   const url = doc.output('bloburl');
   const ventana = window.open(url, '_blank');
   if (!ventana) doc.save(nombreArchivo(g));
+}
+
+/**
+ * Abre WhatsApp con el comprobante en texto para el cliente.
+ * (WhatsApp no permite adjuntar el PDF desde una liga; si se quiere el PDF,
+ * se descarga y se adjunta a mano en la conversación.)
+ */
+export function enviarPorWhatsApp(g: Garantia): boolean {
+  const tel = g.telefono.replace(/\D/g, '');
+  if (tel.length !== 10) return false;
+  const texto = [
+    'Ferre Don Nico · Comprobante de garantía',
+    `Folio: ${g.folio}`,
+    `Fecha: ${fechaHora(g.fechaRecibo)}`,
+    `Cliente: ${g.cliente}`,
+    `Producto: ${[g.codigo, g.descripcion].filter(Boolean).join(' - ')} (Cant. ${g.cantidad})`,
+    `Motivo: ${g.motivo}`,
+    '',
+    'Presente su ticket impreso o este folio para recoger su producto. Le avisaremos por este medio cuando esté listo.',
+  ].join('\n');
+  window.open(`https://wa.me/52${tel}?text=${encodeURIComponent(texto)}`, '_blank');
+  return true;
 }
