@@ -102,7 +102,7 @@ export default function Reporte() {
           />
           <Seccion
             titulo={`Más de ${DIAS_LIMITE} días abiertas (sin nota de crédito)`}
-            accion="Escalar con el proveedor o dar solución al cliente."
+            accion="Escalar con el proveedor por medio del Departamento de Compras."
             lista={reporte.masDe30}
           />
           <Seccion

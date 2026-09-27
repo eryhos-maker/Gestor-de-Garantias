@@ -70,7 +70,7 @@ export default function Asistente() {
           >
             <div className="px-4 py-3 bg-brand-blue text-white rounded-t-2xl">
               <p className="font-semibold">Asistente de Garantías</p>
-              <p className="text-xs text-white/80">Respuestas del manual de garantías de Ferre Mina</p>
+              <p className="text-xs text-white/80">Respuestas del procedimiento de garantías FER-PR-01</p>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3 text-sm">

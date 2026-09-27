@@ -166,7 +166,7 @@ export function imprimirTicket(g: Garantia): void {
 /** Mensaje de WhatsApp según la etapa de la garantía. */
 export function mensajeWhatsApp(g: Garantia): string {
   const producto = [g.codigo, g.descripcion].filter(Boolean).join(' - ');
-  const saludo = `Hola ${g.cliente.split(' ')[0] || ''}, le escribimos de Ferre Don Nico (Ferre Mina).`.replace(' ,', ',');
+  const saludo = `Hola ${g.cliente.split(' ')[0] || ''}, le escribimos de Ferre Don Nico.`.replace(' ,', ',');
   if (g.estatus === 'En Tienda') {
     return [
       saludo,

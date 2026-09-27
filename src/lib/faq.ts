@@ -1,6 +1,6 @@
 /**
  * Preguntas frecuentes del Asistente de Garantías.
- * Las respuestas salen del manual FER-PR-01 (Procedimiento de Garantías).
+ * Las respuestas salen del procedimiento FER-PR-01 (Procedimiento de Garantías).
  * Para agregar o cambiar una respuesta, edita esta lista: `claves` son las
  * palabras que suele usar el personal al preguntar.
  */
@@ -129,7 +129,7 @@ export const FAQS: Faq[] = [
     pregunta: '¿Cuánto tiempo puede tardar el proveedor?',
     claves: ['cuanto tarda', 'tiempo', 'dias', 'plazo proveedor', '30 dias', 'tardanza'],
     respuesta:
-      'Máximo 30 días. Si pasa de ahí, el gerente lo escala con el proveedor. La app marca en rojo los días abiertos después de 30.',
+      'Máximo 30 días. Si pasa de ahí, el gerente lo escala con el proveedor por medio del Departamento de Compras. La app marca en rojo los días abiertos después de 30.',
   },
 ];
 

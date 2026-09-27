@@ -69,7 +69,7 @@ export function crearReportePdf(r: ReporteSemanal): jsPDF {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(15);
-  doc.text('Revisión de los lunes · Garantías Ferre Mina', M, y + 5);
+  doc.text('Revisión de los lunes · Garantías Ferre Don Nico', M, y + 5);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9.5);
   y += 11;
@@ -142,7 +142,7 @@ export function crearReportePdf(r: ReporteSemanal): jsPDF {
     r.avisosPendientes,
   );
   seccion(`Con ${MAX_AVISOS} avisos o más`, 'El cliente no ha recogido: lo decide el gerente.', r.tresAvisos);
-  seccion(`Más de ${DIAS_LIMITE} días abiertas (sin nota de crédito)`, 'Escalar con el proveedor o dar solución al cliente.', r.masDe30);
+  seccion(`Más de ${DIAS_LIMITE} días abiertas (sin nota de crédito)`, 'Escalar con el proveedor por medio del Departamento de Compras.', r.masDe30);
   seccion('Con nota de crédito', 'Aplicar cambio físico o, si ya no se maneja, a cuenta de otra compra.', r.notaCredito);
 
   // Firmas de la revisión
