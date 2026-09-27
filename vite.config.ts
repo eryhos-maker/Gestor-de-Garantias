@@ -6,6 +6,18 @@ import {defineConfig} from 'vite';
 export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss()],
+    build: {
+      rollupOptions: {
+        output: {
+          // Separa las librerías grandes en archivos propios: la app carga
+          // igual, pero el navegador las guarda en caché entre versiones.
+          manualChunks: {
+            pdf: ['jspdf'],
+            react: ['react', 'react-dom', 'motion/react'],
+          },
+        },
+      },
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
